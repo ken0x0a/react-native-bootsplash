@@ -3,7 +3,10 @@ package com.zoontek.rnbootsplash;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
+import android.os.Build;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
 
@@ -50,7 +53,7 @@ public class RNBootSplashModule extends ReactContextBaseJavaModule implements Li
   public void hide(final Float duration) {
     if (hideHasRunOnce) return;
 
-    Activity activity = getReactApplicationContext().getCurrentActivity();
+    final Activity activity = getReactApplicationContext().getCurrentActivity();
 
     if (activity == null) {
       hideOnAppResume = true;
@@ -85,6 +88,18 @@ public class RNBootSplashModule extends ReactContextBaseJavaModule implements Li
                 parent.removeView(layout);
               }
             }).start();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+          final Window window = activity.getWindow();
+          new android.os.Handler().postDelayed(
+            new Runnable() {
+              public void run() {
+                window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+              }
+            },
+            300
+          );
+        }
       }
     });
   }
